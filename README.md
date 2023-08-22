@@ -3,6 +3,7 @@
 Small tool to automatically test web developer final projects for common mistakes.
 
 Tested on Linux, should also work on MacOS. On Windows it should run using Git Bash.
+
 ## Installation
 
 Requires Go version 1.19.
@@ -18,3 +19,9 @@ go install
 ```
 
 Will install the binary in your `$GOPATH`.
+
+## TODO
+
+- [ ] Report errors that occur when trying to execute PHP files
+- [ ] Crawl website to search for dead links
+- [ ] Check if invalid form submissions are possible

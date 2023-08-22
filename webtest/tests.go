@@ -266,9 +266,18 @@ func processImageFile(info os.FileInfo) testResult {
 	return result
 }
 
-func runVnu(filenames []string) []testResult {
+func runVnu(filenames *[]string) []testResult {
+
+	if len(*filenames) == 0 {
+		return []testResult{}
+	}
+
 	params := []string{"-jar", VNU_JAR_FILENAME, "--stdout", "--exit-zero-always"}
-	params = append(params, filenames...)
+	if strings.HasSuffix((*filenames)[0], ".css") {
+		params = append(params, "--css")
+	}
+
+	params = append(params, *filenames...)
 
 	var cmd *exec.Cmd
 	cmd = exec.Command("java", params...)
@@ -281,7 +290,7 @@ func runVnu(filenames []string) []testResult {
 
 func runVnuPHP(filenames *[]string) []testResult {
 
-	if !checkCommandAvailable("php") {
+	if !checkCommandAvailable("php") || len(*filenames) == 0 {
 		return []testResult{}
 	}
 
@@ -311,7 +320,12 @@ func runVnuPHP(filenames *[]string) []testResult {
 	}
 	os.Chdir(pwd)
 
-	return runVnu([]string{TMP_HTML_DIR})
+	// Remove line numbers since PHP files are converted to HTML
+	test_results := runVnu(&[]string{TMP_HTML_DIR})
+	for i := 0; i < len(test_results); i++ {
+		test_results[i].linenumber = ""
+	}
+	return test_results
 }
 
 func parseVnuResult(lines string) []testResult {
@@ -362,8 +376,8 @@ func parseVnuResult(lines string) []testResult {
 
 func processValidationTest(filepaths *filePaths) []testResult {
 
-	result := runVnu(filepaths.html)
-	result = append(result, runVnu(filepaths.css)...)
+	result := runVnu(&filepaths.html)
+	result = append(result, runVnu(&filepaths.css)...)
 
 	return result
 }

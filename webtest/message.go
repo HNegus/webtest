@@ -22,7 +22,7 @@ func banner() {
 	printInfo("Information")
 	printSuccess("No problem")
 	printWarning("Minor problem")
-	printFailure("Potential problem")
+	printFailure("Problem")
 	printError("Major problem")
 }
 
