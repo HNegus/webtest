@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 )
 
 func getServerRoot(filepaths filePaths) (bool, string) {
@@ -44,28 +45,65 @@ func runDevSever(filepaths filePaths, port uint) {
 		printWarning("No homepage found")
 	}
 
+	// TODO: simplify
+	// TODO: add support for killing server
 	printInfo("Server root directory: " + root_folder)
+
+	url := fmt.Sprint("localhost:", port)
 
 	if len(filepaths.php) > 0 {
 		if !checkCommandAvailable("php") {
 			printFailure("php not available, starting HTTP server")
 		} else {
-			os.Chdir(root_folder)
-			cmd := exec.Command("php", "-S", fmt.Sprint("localhost:", port))
+			cmd := exec.Command("php", "-S", url)
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
-			if err := cmd.Run(); err != nil {
+			cmd.Dir = root_folder
+			if err := cmd.Start(); err != nil {
 				log.Println("Error running php ", err)
 			}
+
+			url = fmt.Sprint("http://", url)
+
+			switch runtime.GOOS {
+			case "linux":
+				exec.Command("xdg-open", url).Start()
+			case "windows":
+				exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+			case "darwin":
+				exec.Command("open", url).Start()
+			default:
+			}
+			cmd.Wait()
+
 			return
 		}
 
 	}
-
-	printSuccess("Starting HTTP server on http://localhost:" + fmt.Sprint(port))
 	http.Handle("/", http.FileServer(http.Dir(root_folder)))
-	err := http.ListenAndServe(fmt.Sprint(":", port), nil)
-	if err != nil {
-		printFailure(err.Error())
+	channel := make(chan int)
+
+	go func(done chan int) {
+		err := http.ListenAndServe(fmt.Sprint(":", port), nil)
+		if err != nil {
+			printFailure(err.Error())
+			done <- 0
+		}
+	}(channel)
+
+	url = fmt.Sprint("http://", url)
+
+	printSuccess("Starting HTTP server on " + url)
+
+	switch runtime.GOOS {
+	case "linux":
+		exec.Command("xdg-open", url).Start()
+	case "windows":
+		exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		exec.Command("open", url).Start()
+	default:
 	}
+	<-channel
+
 }
