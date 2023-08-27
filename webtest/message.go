@@ -26,7 +26,7 @@ func banner() {
 	printError("Major problem")
 }
 
-func trailer() {
+func printTestsTrailer() {
 	banner := color.New(color.FgGreen, color.Bold, color.Italic)
 
 	fmt.Println()

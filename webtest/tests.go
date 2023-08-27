@@ -75,7 +75,7 @@ func runIndexTest(result chan []testResult, input chan interface{}) {
 		return
 	}
 
-	for _, filename := range filepaths.html {
+	for _, filename := range append(filepaths.html, filepaths.php...) {
 		if matched, _ := regexp.MatchString("index", strings.ToLower(filename)); matched {
 			test_results = append(test_results, testResult{
 				file:        filename,
@@ -84,15 +84,7 @@ func runIndexTest(result chan []testResult, input chan interface{}) {
 			})
 		}
 	}
-	for _, filename := range filepaths.php {
-		if matched, _ := regexp.MatchString("index", strings.ToLower(filename)); matched {
-			test_results = append(test_results, testResult{
-				file:        filename,
-				message:     "Potential homepage",
-				result_type: testSuccess,
-			})
-		}
-	}
+
 	if len(test_results) == 0 {
 		result <- []testResult{{
 			message:     "No homepage found",

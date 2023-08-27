@@ -25,3 +25,4 @@ Will install the binary in your `$GOPATH`.
 - [ ] Report errors that occur when trying to execute PHP files
 - [ ] Crawl website to search for dead links
 - [ ] Check if invalid form submissions are possible
+- [ ] Add logging to HTTP server output

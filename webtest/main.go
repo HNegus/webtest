@@ -26,7 +26,7 @@ func showAvailableTests(tests []testInstance) {
 	printHeading("Available tests")
 
 	for i, test := range tests {
-		message := strconv.Itoa(i) + ". " + test.name
+		message := strconv.Itoa(i+1) + ". " + test.name
 		if test.experimental {
 			message += " [EXPERIMENTAL]"
 		}
@@ -38,16 +38,17 @@ func showAvailableTests(tests []testInstance) {
 	}
 }
 
-func getExtension(filepath string) string {
+func getExtension(path string) string {
 
-	b := []byte(filepath)
-	if match, _ := regexp.Match(`\.html?`, b); match {
+	path = filepath.Ext(path)
+	b := []byte(path)
+	if match, _ := regexp.Match(`html?`, b); match {
 		return "html"
-	} else if match, _ := regexp.Match(`\.(php\d?|pht|phtml)`, b); match {
+	} else if match, _ := regexp.Match(`(php\d?|pht|phtml)`, b); match {
 		return "php"
-	} else if match, _ := regexp.Match(`\.(a?png|p?jpe?g|jfif|pjp|svg|bmp|gif|avif|webp|tiff)`, b); match {
+	} else if match, _ := regexp.Match(`(a?png|p?jpe?g|jfif|pjp|svg|bmp|gif|avif|webp|tiff)`, b); match {
 		return "img"
-	} else if match, _ := regexp.Match(`\.css`, b); match {
+	} else if match, _ := regexp.Match(`css`, b); match {
 		return "css"
 	} else {
 		return "other"
@@ -175,14 +176,27 @@ func cleanup() {
 	}
 }
 
-func runTests(tests []testInstance, config commandlineOptions) {
+func runRoutines(tests []testInstance, config commandlineOptions) {
+	filepaths := getFilePaths()
+
+	runTests(tests, config, filepaths)
+	printTestsTrailer()
+
+	cleanup()
+
+	if config.run_server {
+		runDevSever(filepaths, config.port)
+	}
+
+}
+
+func runTests(tests []testInstance, config commandlineOptions, filepaths filePaths) {
 	result_channels := make([]chan []testResult, len(tests))
 	for i := 0; i < len(tests); i++ {
 		result_channels[i] = make(chan []testResult)
 	}
 
 	number_of_tests := 0
-	filepaths := getFilePaths()
 
 	for i, test_instance := range tests {
 		if test_instance.enabled {
@@ -225,12 +239,12 @@ func main() {
 
 	var config commandlineOptions
 	flag.StringVar(&config.base_dir, "dir", ".", "Specify directory to check.")
-	flag.UintVar(&config.test_limit, "l", 15, "Maximum number of results per test. Use 0 for all results.")
-	flag.IntVar(&config.selected_test, "test", -1, "Select index of single test to run. Use -1 for all available tests.")
+	flag.UintVar(&config.test_limit, "l", 0, "Maximum number of results per test. Use 0 for all results.")
+	flag.IntVar(&config.selected_test, "test", -1, "Select index of single test to run. Use -1 for all and 0 for no tests.")
 	flag.BoolVar(&config.screenshot, "screenshot", false, "[UNAVAILABLE] Make screenshots of all webpages.")
 	flag.BoolVar(&config.experimental, "exp", false, "Run experimental tests.")
-	flag.BoolVar(&config.run_server, "serve", false, "[UNAVAILABLE] Run local server for the website.")
-	flag.UintVar(&config.port, "p", 8000, "[UNAVAILABLE] Port to serve on.")
+	flag.BoolVar(&config.run_server, "serve", false, "Run local server for the website.")
+	flag.UintVar(&config.port, "p", 8000, "Port to serve on.")
 
 	defer cleanup()
 
@@ -255,13 +269,16 @@ func main() {
 		os.Exit(1)
 	}()
 
-	if config.selected_test >= 0 && config.selected_test < len(available_tests) {
+	// Disable all tests
+	if config.selected_test >= 0 {
 		for i := range available_tests {
 			available_tests[i].enabled = false
 		}
-		available_tests[config.selected_test].enabled = true
+	}
+	// Enable only selected test
+	if config.selected_test >= 1 && config.selected_test <= len(available_tests) {
+		available_tests[config.selected_test-1].enabled = true
 	}
 
-	runTests(available_tests, config)
-	trailer()
+	runRoutines(available_tests, config)
 }
