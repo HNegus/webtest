@@ -117,25 +117,25 @@ func setup(base_dir string, enable_experimental bool) []testInstance {
 
 	available_tests := []testInstance{
 		{
-			name:            "Searching for README.md",
+			name:            "Search for README.md",
 			enabled:         true,
 			wants_filepaths: true,
 			runner:          runReadmeTest,
 		},
 		{
-			name:            "Searching for homepage",
+			name:            "Search for homepage",
 			enabled:         true,
 			wants_filepaths: true,
 			runner:          runIndexTest,
 		},
 		{
-			name:            "Searching for large image files",
+			name:            "Search for large image files",
 			enabled:         true,
 			wants_filepaths: true,
 			runner:          runImageFileSizeTest,
 		},
 		{
-			name:    "Searching for potential absolute paths",
+			name:    "Search for potential absolute paths",
 			enabled: grep_binary_name != "",
 			runner:  runAbsolutePathTest,
 			data:    grep_binary_name,
@@ -153,8 +153,7 @@ func setup(base_dir string, enable_experimental bool) []testInstance {
 		},
 		{
 			name:            "PHP W3C validation checks",
-			experimental:    true,
-			enabled:         w3c_validation && enable_experimental,
+			enabled:         w3c_validation,
 			wants_filepaths: true,
 			runner:          runPHPValidationTest,
 		},

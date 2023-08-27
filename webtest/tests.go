@@ -410,7 +410,7 @@ func validationTestDependencies() bool {
 	} else {
 		os.Mkdir(TMP_HTML_DIR, 0750)
 		printSuccess("Found php")
-		printWarning("W3C validation checks for PHP files are experimental")
+		printWarning("W3C validation checks for PHP files can give a lot of results")
 	}
 
 	printSuccess("Built VNU HTML/CSS checker")
