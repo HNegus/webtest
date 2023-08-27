@@ -179,15 +179,17 @@ func cleanup() {
 func runRoutines(tests []testInstance, config commandlineOptions) {
 	filepaths := getFilePaths()
 
+	if config.run_server {
+		runDevSever(filepaths, config.port)
+		return
+	}
+	banner()
+	showAvailableTests(tests)
+
 	runTests(tests, config, filepaths)
 	printTestsTrailer()
 
 	cleanup()
-
-	if config.run_server {
-		runDevSever(filepaths, config.port)
-	}
-
 }
 
 func runTests(tests []testInstance, config commandlineOptions, filepaths filePaths) {
@@ -257,9 +259,8 @@ func main() {
 		cleanup()
 	}
 	flag.Parse()
-	banner()
+
 	available_tests := setup(config.base_dir, config.experimental)
-	showAvailableTests(available_tests)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

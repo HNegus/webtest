@@ -64,5 +64,8 @@ func runDevSever(filepaths filePaths, port uint) {
 
 	printSuccess("Starting HTTP server on http://localhost:" + fmt.Sprint(port))
 	http.Handle("/", http.FileServer(http.Dir(root_folder)))
-	http.ListenAndServe(fmt.Sprint(":", port), nil)
+	err := http.ListenAndServe(fmt.Sprint(":", port), nil)
+	if err != nil {
+		printFailure(err.Error())
+	}
 }
