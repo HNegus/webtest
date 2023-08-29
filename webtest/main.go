@@ -189,7 +189,7 @@ func runRoutines(tests []testInstance, config commandlineOptions) {
 	}
 	banner()
 	showAvailableTests(tests)
-	fmt.Println(filepaths)
+
 	runTests(tests, config, filepaths)
 	printTestsTrailer()
 

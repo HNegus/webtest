@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -265,7 +264,7 @@ func runVnu(filenames *[]string) []testResult {
 	if len(*filenames) == 0 {
 		return []testResult{}
 	}
-	fmt.Println(VNU_JAR_FILENAME)
+
 	params := []string{"-jar", VNU_JAR_FILENAME, "--stdout", "--exit-zero-always"}
 	if strings.HasSuffix((*filenames)[0], ".css") {
 		params = append(params, "--css")
@@ -307,7 +306,7 @@ func runVnuPHP(filenames *[]string) []testResult {
 
 		os.Chdir(path)
 		cmd := exec.Command("php", "-f", filepath.Join(pwd, filename), new_name)
-		fmt.Println(cmd.Args)
+
 		cmd.Stdout = f
 		if err := cmd.Run(); err != nil {
 			// log.Println("Error running php ", err)
