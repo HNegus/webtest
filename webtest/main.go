@@ -75,6 +75,11 @@ func getFilePaths() filePaths {
 		for _, entry := range entries {
 
 			if entry.IsDir() {
+				if match, _ := regexp.Match("vendor|node_modules", []byte(entry.Name())); match {
+					continue
+
+				}
+				fmt.Println(entry.Name())
 				dir := filepath.Join(base_dir, entry.Name())
 				result.dir = append(result.dir, dir)
 				dir_queue = append(dir_queue, dir)
@@ -184,7 +189,7 @@ func runRoutines(tests []testInstance, config commandlineOptions) {
 	}
 	banner()
 	showAvailableTests(tests)
-
+	fmt.Println(filepaths)
 	runTests(tests, config, filepaths)
 	printTestsTrailer()
 

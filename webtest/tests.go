@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -97,6 +98,7 @@ func runIndexTest(result chan []testResult, input chan interface{}) {
 
 func runAbsolutePathTest(result chan []testResult, input chan interface{}) {
 
+	// Retrieve which binary to run (rg/grep)
 	data := <-input
 	binary_name := ""
 	switch data.(type) {
@@ -263,7 +265,7 @@ func runVnu(filenames *[]string) []testResult {
 	if len(*filenames) == 0 {
 		return []testResult{}
 	}
-
+	fmt.Println(VNU_JAR_FILENAME)
 	params := []string{"-jar", VNU_JAR_FILENAME, "--stdout", "--exit-zero-always"}
 	if strings.HasSuffix((*filenames)[0], ".css") {
 		params = append(params, "--css")
@@ -305,6 +307,7 @@ func runVnuPHP(filenames *[]string) []testResult {
 
 		os.Chdir(path)
 		cmd := exec.Command("php", "-f", filepath.Join(pwd, filename), new_name)
+		fmt.Println(cmd.Args)
 		cmd.Stdout = f
 		if err := cmd.Run(); err != nil {
 			// log.Println("Error running php ", err)
@@ -448,22 +451,22 @@ func getAbsolutePathsCommandOutput(binary_name string) string {
 		regex += ".*" + p + ".*|"
 	}
 	regex = strings.TrimSuffix(regex, "|")
-	// fmt.Println(regex)
-
 	var err error
 
 	switch binary_name {
 	case "rg":
-		output, err = exec.Command("rg", "-inH", "--no-heading", regex).Output()
-		// fmt.Println(regex)
+		// TODO: find more elegant way to exclude binary folders
+		args := []string{"inH", "--no-heading", "-g '!vendor'", "-g '!node_modules'", regex}
+		output, err = exec.Command("rg", args...).Output()
 	case "grep":
 		regex = strings.ReplaceAll(regex, ".*", "")
-		// fmt.Println(regex)
-		output, err = exec.Command("grep", "-PIRin", regex).Output()
+		args := []string{"-PIRin", "--exclude-dir vendor", "--exclude_dir node_modules", regex}
+		output, err = exec.Command("grep", args...).Output()
 	default:
 		break
 	}
 
+	// TODO: ??? why is this check here?
 	if err != nil {
 		return string(output)
 	}
