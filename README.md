@@ -6,7 +6,7 @@ Tested on Linux, should also work on MacOS. On Windows it should run using Git B
 
 ## Installation
 
-Requires Go version 1.19.
+Requires Go version >= 1.19.
 
 ### Building from source
 
