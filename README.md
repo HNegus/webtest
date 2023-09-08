@@ -26,3 +26,4 @@ Will install the binary in your `$GOPATH`.
 - [ ] Crawl website to search for dead links
 - [ ] Check if invalid form submissions are possible
 - [ ] Add logging to HTTP server output
+- [ ] Auto import SQL if `import.sql` or `*.sql` is found
