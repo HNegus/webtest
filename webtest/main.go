@@ -9,14 +9,22 @@ import (
 	"os/signal"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strconv"
 	"syscall"
 )
 
 func checkCommandAvailable(command string) bool {
-	cmd := exec.Command(command, "--version")
+	flag := ""
+	switch os := runtime.GOOS; os {
+	case "linux":
+		flag = "--version"
+	case "windows":
+		flag = "/version"
+	}
+	cmd := exec.Command(command, flag)
 	if err := cmd.Run(); err != nil {
-		log.Fatal("Error checking command:", command)
+		log.Print(err)
 		return false
 	}
 	return true
