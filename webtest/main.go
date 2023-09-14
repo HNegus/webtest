@@ -79,7 +79,6 @@ func getFilePaths() filePaths {
 					continue
 
 				}
-				fmt.Println(entry.Name())
 				dir := filepath.Join(base_dir, entry.Name())
 				result.dir = append(result.dir, dir)
 				dir_queue = append(dir_queue, dir)
