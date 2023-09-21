@@ -24,7 +24,7 @@ func checkCommandAvailable(command string) bool {
 	}
 	cmd := exec.Command(command, flag)
 	if err := cmd.Run(); err != nil {
-		log.Print(err)
+		log.Println(err)
 		return false
 	}
 	return true

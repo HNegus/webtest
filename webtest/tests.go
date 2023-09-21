@@ -309,7 +309,7 @@ func runVnuPHP(filenames *[]string) []testResult {
 
 		cmd.Stdout = f
 		if err := cmd.Run(); err != nil {
-			// log.Println("Error running php ", err)
+			log.Println("Error running php ", err)
 		}
 	}
 	os.Chdir(pwd)
