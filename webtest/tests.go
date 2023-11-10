@@ -232,21 +232,19 @@ func processImageFile(info os.FileInfo) testResult {
 		return testResult{}
 	case 1:
 		suffix = "Kb"
-		if size > 500 {
-			result.result_type = testInfo
-		} else if size > 750 {
+		if size > 750 {
+			result.result_type = testFail
+		} else if size > 400 {
 			result.result_type = testWarn
+		} else if size > 200 {
+			result.result_type = testInfo
 		} else {
 			return testResult{}
 		}
 		break
 	case 2:
 		suffix = "Mb"
-		if size > 1.5 {
-			result.result_type = testErr
-		} else {
-			result.result_type = testFail
-		}
+		result.result_type = testErr
 		break
 	case 3:
 		suffix = "Gb"
