@@ -27,3 +27,4 @@ Will install the binary in your `$GOPATH`.
 - [ ] Check if invalid form submissions are possible
 - [ ] Add logging to HTTP server output
 - [ ] Auto import SQL if `import.sql` or `*.sql` is found
+- [ ] Warn if `.htaccess` file is found and server is run
